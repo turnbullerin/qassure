@@ -1,3 +1,10 @@
+from qassure import Auditor
+
+
+class BaseAuditor(Auditor):
+
+    def audit(self):
+        pass
 
 
 class TruthyClass:
@@ -17,3 +24,4 @@ class CallableClass:
 
     def __call__(self):
         return "five"
+

@@ -7,7 +7,7 @@ import tests.helpers as helpers
 class TestAgent(unittest.TestCase):
 
     def test_add_report_item(self):
-        agent = qassure.Agent()
+        agent = helpers.BaseAuditor()
         self.assertEqual(len(agent.report), 0)
         agent.add_report_item(
             qassure.Severity.BLOCKER,
@@ -32,28 +32,28 @@ class TestAgent(unittest.TestCase):
         self.assertEqual(agent.report[1][2], "Unknown")
 
     def test_blocking_failure(self):
-        class AgentForTesting(qassure.Agent):
+        class AuditorForTesting(qassure.Auditor):
             def audit(self):
                 self.inspect(None, qassure.Severity.BLOCKER).is_not_none()
                 self.inspect(1).is_type(str)
-        obj = AgentForTesting()
+        obj = AuditorForTesting()
         obj.run_audit()
         self.assertEqual(len(obj.report), 1)
         self.assertTrue(obj.is_blocked)
 
     def test_preblocking_failure(self):
-        class AgentForTesting(qassure.Agent):
+        class AuditorForTesting(qassure.Auditor):
             def audit(self):
                 self.inspect(2).is_type(str)
                 self.inspect(None, qassure.Severity.BLOCKER).is_not_none()
                 self.inspect(1).is_type(str)
-        obj = AgentForTesting()
+        obj = AuditorForTesting()
         obj.run_audit()
         self.assertEqual(len(obj.report), 2)
         self.assertTrue(obj.is_blocked)
 
     def test_inspector_creation(self):
-        agent = qassure.Agent()
+        agent = helpers.BaseAuditor()
         inspector = agent.inspect("a", qassure.Severity.BLOCKER, "abc")
         self.assertEqual(inspector.error_level, qassure.Severity.BLOCKER)
         self.assertEqual(inspector.object_name, "abc")
@@ -80,7 +80,7 @@ class TestAgent(unittest.TestCase):
 class TestInspector(unittest.TestCase):
 
     def setUp(self):
-        self.agent = qassure.Agent()
+        self.agent = helpers.BaseAuditor()
 
     def test_report_deficiency(self):
         inspector = self.agent.inspect("test", qassure.Severity.BLOCKER)
@@ -206,6 +206,8 @@ class TestInspector(unittest.TestCase):
     def test_is_equal_to(self):
         self.assertIsNotDeficiency(self.agent.inspect(5).is_equal_to, 5)
         self.assertIsDeficiency(self.agent.inspect(5).is_equal_to, "5")
+        self.assertIsDeficiency(self.agent.inspect("").is_equal_to, False)
+        self.assertIsDeficiency(self.agent.inspect("").is_equal_to, 0)
 
     def test_if_not_none(self):
         self.assertIsDeficiency(self.agent.inspect("five").if_not_none().is_type, int)

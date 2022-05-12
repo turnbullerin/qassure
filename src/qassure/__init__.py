@@ -1,2 +1,2 @@
 from .framework import Severity
-from .framework import Agent
+from .framework import Auditor
