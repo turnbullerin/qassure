@@ -1,4 +1,4 @@
-from qassure import Auditor
+from qassure import Auditor, Severity
 
 
 class BaseAuditor(Auditor):
@@ -25,3 +25,22 @@ class CallableClass:
     def __call__(self):
         return "five"
 
+
+class AuditorNoFailures(Auditor):
+
+    def audit(self):
+        self.claim(1).is_truthy()
+        self.claim(1, Severity.WARNING).is_truthy()
+        self.claim(1, Severity.CRITICAL).is_truthy()
+        self.claim(1, Severity.ERROR).is_truthy()
+        self.claim(1, Severity.BLOCKER).is_truthy()
+
+
+class AuditorWithWarning(Auditor):
+
+    def audit(self):
+        self.claim(1).is_truthy()
+        self.claim(0, Severity.WARNING).is_truthy()
+        self.claim(1, Severity.CRITICAL).is_truthy()
+        self.claim(1, Severity.ERROR).is_truthy()
+        self.claim(1, Severity.BLOCKER).is_truthy()
